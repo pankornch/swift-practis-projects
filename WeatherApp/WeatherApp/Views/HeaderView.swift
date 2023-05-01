@@ -8,13 +8,24 @@
 import SwiftUI
 
 struct HeaderLocationView: View {
+    var countryName: String
+    var date: Date
+    
+    func dateFormatter(_ from: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "d MMMM yyyy, EEEE"
+        return formatter.string(from: from)
+    }
+    
     var body: some View {
         HStack {
             VStack (alignment: .leading, spacing: 16) {
-                Text("Thailand")
+                Text(countryName)
                     .foregroundColor(Color("White"))
                     .font(.title)
-                Text("1 Jan 2023, Sunday")
+                    .fontWeight(.bold)
+                Text(dateFormatter(date))
                     .foregroundColor(Color("DimGray"))
                     .font(.subheadline)
             }
@@ -24,17 +35,16 @@ struct HeaderLocationView: View {
 }
 
 struct CurrentWeatherHeaderView: View {
-    var degree: Int
-    var description: String
+    @EnvironmentObject var viewModel: ForecastViewModel
     
     var body: some View {
         HStack(alignment: .center){
             VStack(alignment: .leading) {
-                Text("\(degree)°")
+                Text("\(String(format: "%.1f", viewModel.weather?.current.tempC ?? 0))°")
                     .font(.system(size: 72))
                     .foregroundColor(Color("White"))
                     .fontWeight(.bold)
-                Text(description)
+                Text(viewModel.weather?.current.condition.text ?? "")
                     .foregroundColor(Color("DimGray"))
                     .font(.subheadline)
                 

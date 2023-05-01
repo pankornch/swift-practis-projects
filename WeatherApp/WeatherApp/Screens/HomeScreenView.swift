@@ -8,23 +8,35 @@
 import SwiftUI
 
 struct HomeScreenView: View {
+    @StateObject var viewModel = ForecastViewModel()
+    
+    var location = "Thailand"
+    
     var body: some View {
         VStack {
             VStack {
-                HeaderLocationView()
+                HeaderLocationView(countryName: location, date: .now)
                 
-                CurrentWeatherHeaderView(degree: 18, description: "Thunderstorm")
+                CurrentWeatherHeaderView()
+                    .environmentObject(viewModel)
                 
-                CurrentWeatherView(wind: 10, humidity: 98, rain: 100)
+                CurrentWeatherView()
+                    .environmentObject(viewModel)
                 
-                ForcastTabsView()
+                ForecastTabsView()
                 
-                ForcastHourListView()
+                ForecastHourListView()
             }
             Spacer()
         }
         .padding()
         .background(Color("Dark"))
+        .onAppear {
+            Task {
+                let res = try await viewModel.fetchForecastApi(form: location)
+                viewModel.weather = res
+            }
+        }
     }
 }
 

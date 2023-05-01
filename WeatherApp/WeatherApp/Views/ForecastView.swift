@@ -8,9 +8,7 @@
 import SwiftUI
 
 struct CurrentWeatherView: View {
-    var wind: Int
-    var humidity: Int
-    var rain: Int
+    @EnvironmentObject var viewModel: ForecastViewModel
     
     var body: some View {
         HStack {
@@ -18,7 +16,7 @@ struct CurrentWeatherView: View {
                 Image(systemName: "wind")
                     .foregroundColor(Color("White"))
                     .font(.system(size: 32))
-                Text("\(wind) m/s")
+                Text("\(String(format: "%.1f", viewModel.weather?.current.windKph ?? 0)) m/s")
                     .foregroundColor(Color("White"))
                 Text("Wind")
                     .foregroundColor(Color("DimGray"))
@@ -28,19 +26,19 @@ struct CurrentWeatherView: View {
                 Image(systemName: "humidity.fill")
                     .foregroundColor(Color("White"))
                     .font(.system(size: 32))
-                Text("\(humidity)%")
+                Text("\(viewModel.weather?.current.humidity ?? 0)%")
                     .foregroundColor(Color("White"))
                 Text("Humidity")
                     .foregroundColor(Color("DimGray"))
             }
             Spacer()
             VStack(spacing: 6) {
-                Image(systemName: "umbrella.percent.fill")
+                Image(systemName: "cloud.fill")
                     .foregroundColor(Color("White"))
                     .font(.system(size: 32))
-                Text("\(rain)%")
+                Text("\(viewModel.weather?.current.cloud ?? 0)%")
                     .foregroundColor(Color("White"))
-                Text("Rain")
+                Text("Cloud")
                     .foregroundColor(Color("DimGray"))
             }
         }
@@ -52,7 +50,7 @@ struct CurrentWeatherView: View {
 }
 
 
-struct ForcastHourCardView: View {
+struct ForecastHourCardView: View {
     var hour: Int
     var symbol: String
     var degree: Int
@@ -74,7 +72,7 @@ struct ForcastHourCardView: View {
     }
 }
 
-struct ForcastTabsView: View {
+struct ForecastTabsView: View {
     var body: some View {
         HStack {
             Text("Today")
@@ -100,12 +98,14 @@ struct ForcastTabsView: View {
     }
 }
 
-struct ForcastHourListView: View {
+struct ForecastHourListView: View {
+    @StateObject var viewModel = ForecastViewModel()
+    
     var body: some View {
         ScrollView(.horizontal) {
             HStack(spacing: 16) {
-                ForEach((1...24), id: \.self) { i in
-                    ForcastHourCardView(hour: i, symbol: "sun.max.fill", degree: 16)
+                ForEach(viewModel.getForecastHours(), id: \.self) { i in
+                    ForecastHourCardView(hour: i, symbol: "sun.max.fill", degree: 16)
                 }
             }
         }
